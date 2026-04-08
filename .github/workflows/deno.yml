@@ -1,22 +1,48 @@
 name: Deno
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+permissions: {}
+
 on:
   push:
     branches: [master]
   pull_request:
     branches: [master]
 
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
 jobs:
+  zizmor:
+    name: Run zizmor
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Required for upload-sarif (used by zizmor-action) to upload SARIF files.
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Run zizmor
+        uses: zizmorcore/zizmor-action@71321a20a9ded102f6e9ce5718a2fcec2c4f70d8 # v0.5.2
+
   test:
     runs-on: ubuntu-latest
+    name: Test
+    permissions: {}
 
     steps:
       - name: Setup repo
-        # 6.0.2
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Deno
-        # 2.0.4
-        uses: denoland/setup-deno@667a34cdef165d8d2b2e98dde39547c9daac7282
+        uses: denoland/setup-deno@667a34cdef165d8d2b2e98dde39547c9daac7282 # 2.0.4
         with:
           deno-version: "^2"
 
@@ -27,6 +53,9 @@ jobs:
     if: github.repository == 'AnInternetTroll/speedrunbot-slash-deno-deploy-2' && github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     needs: [test]
+    environment: production
+    name: Deploy
+    permissions: {}
 
     env:
       TOKEN: ${{ secrets.TOKEN }}
@@ -38,12 +67,12 @@ jobs:
 
     steps:
       - name: Setup repo
-        # 6.0.2
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # 6.0.2
+        with:
+          persist-credentials: false
 
       - name: Setup Deno
-        # 2.0.4
-        uses: denoland/setup-deno@667a34cdef165d8d2b2e98dde39547c9daac7282
+        uses: denoland/setup-deno@667a34cdef165d8d2b2e98dde39547c9daac7282 # 2.0.4
         with:
           deno-version: "^2"
 
