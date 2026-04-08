@@ -49,7 +49,9 @@ export async function handler(req: Request): Promise<Response> {
 			status: STATUS_CODE.NotFound,
 		});
 	} // Else return a nice website
-	else return renderPage(<NotFound pathname={pathname} />);
+	else {return renderPage(<NotFound pathname={pathname} />, {
+			status: STATUS_CODE.NotFound,
+		});}
 }
 
 function NotFound({ pathname }: {
