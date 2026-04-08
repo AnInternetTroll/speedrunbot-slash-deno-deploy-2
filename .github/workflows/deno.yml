@@ -1,4 +1,4 @@
-name: Deno
+name: CI / CD
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -29,6 +29,8 @@ jobs:
 
       - name: Run zizmor
         uses: zizmorcore/zizmor-action@71321a20a9ded102f6e9ce5718a2fcec2c4f70d8 # v0.5.2
+        with:
+          persona: auditor
 
   test:
     runs-on: ubuntu-latest
